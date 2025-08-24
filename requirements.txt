@@ -6,3 +6,4 @@ missingno
 wordcloud
 plotly
 pycountry
+kaleido
