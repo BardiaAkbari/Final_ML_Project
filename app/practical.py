@@ -6,6 +6,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.preprocessing import Preprocessing
 from src.eda import EDA
+from src.feature_engineering import FeatureEngineering
+import pandas as pd
 
 def main():
     # Step 1: Preprocessing
@@ -16,7 +18,10 @@ def main():
     eda = EDA(dfs)
     eda.run_all()
 
+    # Step 3: Feature Engineering
+    fe = FeatureEngineering(dfs)
+    fe.run_all()
+
 if __name__ == "__main__":
-    print("START")
+    
     main()
-    print("END")
