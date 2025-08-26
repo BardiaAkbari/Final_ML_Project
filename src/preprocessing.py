@@ -13,8 +13,8 @@ class Preprocessing:
         self.movies_metadata_path = self.main_path + "movies_metadata.csv"
         self.credits_path = self.main_path + "credits.csv"
         self.keywords_path = self.main_path + "keywords.csv"
-        self.links_path = self.main_path + "links.csv"
-        self.ratings_path = self.main_path + "ratings.csv"
+        self.links_path = self.main_path + "links_small.csv"
+        self.ratings_path = self.main_path + "ratings_small.csv"
         self.img_path = "D:/Uni/Term 6/Machine Learning/HomeWork/6/report/images/"
         self.interim_path = "D:/Uni/Term 6/Machine Learning/HomeWork/6/data/interim/"
         self.proceed_path = "D:/Uni/Term 6/Machine Learning/HomeWork/6/data/processed/"
@@ -154,7 +154,8 @@ class Preprocessing:
         self.df.drop_duplicates(subset=['id'], inplace=True)
         self.credits_df.drop_duplicates(subset=['id'], inplace=True)
         self.keywords_df.drop_duplicates(subset=['id'], inplace=True)
-        self.ratings_df.drop_duplicates(subset=['movieId'], inplace=True)
+        self.links_df.drop_duplicates(subset=['tmdbId'], inplace=True)
+        self.ratings_df.drop_duplicates(subset=['movieId', 'userId'], inplace=True)
         
 
     def merge_data(self):
