@@ -162,14 +162,10 @@ class Preprocessing:
         # Merge df, credits_df, and keywords_df on 'id'
         self.merged_df = pd.merge(self.df, self.credits_df, on='id', how='inner')
         self.merged_df = pd.merge(self.merged_df, self.keywords_df, on='id', how='inner')
-
         # Merge with links_df using tmdbId from links_df and id from self.merged_df
-        # links_df has 'movieId' (MovieLens ID) and 'tmdbId' (TMDB ID)
         self.merged_df = pd.merge(self.merged_df, self.links_df, left_on='id', right_on='tmdbId', how='inner')
+        # Do NOT merge with ratings_df here! Only merge for modeling step.
 
-        # Now merge the result with ratings_df using movieId (MovieLens ID)
-        self.merged_df = pd.merge(self.merged_df, self.ratings_df, on='movieId', how='inner')
-        
     def generate_interim_va_proceed_csv(self):
         # Save cleaned DataFrames to interim CSV files
         self.df.to_csv(self.interim_path + "movies_metadata_clean.csv", index=False)
@@ -178,7 +174,7 @@ class Preprocessing:
         self.links_df.to_csv(self.interim_path + "links_clean.csv", index=False)
         self.ratings_df.to_csv(self.interim_path + "ratings_clean.csv", index=False)
         self.merged_df.to_csv(self.proceed_path + "merged_clean.csv", index=False)
-        
+
     def run_all(self):
         self.load_data()
         self.df_missing_value()

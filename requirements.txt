@@ -7,3 +7,5 @@ wordcloud
 plotly
 pycountry
 kaleido
+scikit-learn
+scikit-surprise
