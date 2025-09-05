@@ -7,10 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.preprocessing import Preprocessing
 from src.eda import EDA
 from src.feature_engineering import FeatureEngineering
-from src.modeling import Modeling
-from src.content_based import ContentBasedRecommender
-from src.collaborative import CollaborativeFiltering
-from src.hybrid import HybridRecommender
+from src.modeling import RecommenderModels
 
 def main():
     print("========== Step 1: Preprocessing ==========")
@@ -23,29 +20,32 @@ def main():
 
     print("========== Step 3: Feature Engineering ==========")
     fe = FeatureEngineering(dfs)
-    fe.run_all()
+    fe_outputs = fe.run_all()
+    merged_df = fe_outputs["merged_df"]
+    merged_df_with_tfidf = fe_outputs["merged_df_with_tfidf"]
+    unique_movies_reduced = fe_outputs["unique_movies_reduced"]
+    ratings_df = dfs["ratings_df"]
 
-    print("========== Step 4: Baseline Modeling (Regression) ==========")
-    modeling = Modeling(feature_path="D:/Uni/Term 6/Machine Learning/HomeWork/6/data/interim/feature_engineered_with_ratings.csv")
-    modeling.run_all()
+    print("========== Step 4: Modeling & Recommendation ==========")
+    models = RecommenderModels(
+        merged_df_with_tfidf=merged_df, 
+        merged_df_with_tfidf=merged_df_with_tfidf,
+        unique_movies_reduced=unique_movies_reduced, 
+        ratings_df=ratings_df
+    )
+    models.fit_popularity()
+    models.fit_content_based()
+    models.fit_cf()
+    print("CF RMSEs (kNN, SVD):", models.evaluate_cf())
+    rmse_scores, best_alpha = models.tune_hybrid_alpha()
+    print("Best alpha:", best_alpha)
+    print("Hybrid RMSE:", models.evaluate_hybrid())
 
-    print("========== Step 5: Content-Based Recommendation ==========")
-    cb = ContentBasedRecommender()
-    cb.build_item_vectors()
-    recommendations = cb.recommend(user_id=1, top_n=10)
-    print("Content-based recommendations for user 1:")
-    print(recommendations)
-    if not recommendations.empty:
-        explanation = cb.explain(user_id=1, item_id=recommendations.iloc[0]['movieId'])
-        print("Explanation for top recommendation:", explanation)
+    # Example: get recommendations for user 1
+    print("Top 10 Content-Based Recommendations for user 1:")
+    print(models.get_content_based_recommendations(user_id=1, top_n=10))
 
-    print("========== Step 6: Collaborative Filtering ==========")
-    cf = CollaborativeFiltering()
-    cf.run_all()
-
-    print("========== Step 7: Hybrid Recommendation ==========")
-    hybrid = HybridRecommender()
-    hybrid.run_all(user_id=1, top_n=10)
+    
 
 if __name__ == "__main__":
     main()
