@@ -49,6 +49,7 @@ class EDA:
         plt.savefig(os.path.join(self.img_path, "budget_vs_revenue.png"), bbox_inches='tight')
         plt.close()
 
+<<<<<<< HEAD
         # Convert 'budget' and 'revenue' to numeric, coercing errors to NaN
         self.merged_df['budget'] = pd.to_numeric(self.merged_df['budget'], errors='coerce')
         self.merged_df['revenue'] = pd.to_numeric(self.merged_df['revenue'], errors='coerce')
@@ -58,6 +59,14 @@ class EDA:
         self.merged_df['revenue'] = self.merged_df['revenue'].fillna(0)
 
         # Filter out movies with zero budget AND zero revenue
+=======
+        self.merged_df['budget'] = pd.to_numeric(self.merged_df['budget'], errors='coerce')
+        self.merged_df['revenue'] = pd.to_numeric(self.merged_df['revenue'], errors='coerce')
+
+        self.merged_df['budget'] = self.merged_df['budget'].fillna(0)
+        self.merged_df['revenue'] = self.merged_df['revenue'].fillna(0)
+
+>>>>>>> 848b2a5 (almost finilaize)
         filtered_df = self.merged_df[(self.merged_df['budget'] > 0) | (self.merged_df['revenue'] > 0)].copy()
         plt.figure(figsize=(10, 6))
         sns.scatterplot(data=filtered_df, x='budget', y='revenue')
@@ -270,12 +279,18 @@ class EDA:
         )
 
         fig = go.Figure(data=data, layout=layout)
+<<<<<<< HEAD
         # Save as static image (requires kaleido)
         try:
             # Use plotly.io.write_image for better compatibility
             pio.write_image(fig, os.path.join(self.img_path, "world_production_map.png"))
         except Exception:
             # As a fallback, save as HTML if static image export fails
+=======
+        try:
+            pio.write_image(fig, os.path.join(self.img_path, "world_production_map.png"))
+        except Exception:
+>>>>>>> 848b2a5 (almost finilaize)
             try:
                 fig.write_html(os.path.join(self.img_path, "world_production_map.html"))
             except Exception:
@@ -296,12 +311,18 @@ class EDA:
             title="Movies Distribution by Decade (Release Date)",
             color_discrete_sequence=px.colors.qualitative.Set3
         )
+<<<<<<< HEAD
         # Save as static image (requires kaleido)
         try:
             # Use plotly.io.write_image for better compatibility
             pio.write_image(fig, os.path.join(self.img_path, "movies_by_decade_pie.png"))
         except Exception:
             # As a fallback, save as HTML if static image export fails
+=======
+        try:
+            pio.write_image(fig, os.path.join(self.img_path, "movies_by_decade_pie.png"))
+        except Exception:
+>>>>>>> 848b2a5 (almost finilaize)
             try:
                 fig.write_html(os.path.join(self.img_path, "movies_by_decade_pie.html"))
             except Exception:

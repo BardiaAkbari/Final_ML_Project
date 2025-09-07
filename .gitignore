@@ -1,3 +1,8 @@
 /data
 /venv
+<<<<<<< HEAD
+=======
+/zip
+/models
+>>>>>>> 848b2a5 (almost finilaize)
 x.py

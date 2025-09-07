@@ -12,6 +12,7 @@ class FeatureEngineering:
         self.interim_path = interim_path
         os.makedirs(self.interim_path, exist_ok=True)
     
+<<<<<<< HEAD
     def ordering(self):
         self.merged_df = self.merged_df.drop(columns=['id', 'tmdbId', 'imdbId', 'imdb_id', 'original_title', 'video'])
         desired_column_order = [
@@ -40,6 +41,8 @@ class FeatureEngineering:
 
         self.merged_df = self.merged_df.reindex(columns=desired_column_order)
     
+=======
+>>>>>>> 848b2a5 (almost finilaize)
     def outliers(self):
         self.merged_df['budget'] = pd.to_numeric(self.merged_df['budget'], errors='coerce').fillna(0)
         self.merged_df['revenue'] = pd.to_numeric(self.merged_df['revenue'], errors='coerce').fillna(0)
@@ -78,6 +81,7 @@ class FeatureEngineering:
         self.merged_df['num_cast'] = self.merged_df['cast'].fillna('').apply(lambda x: len([c for c in x.split(',') if c.strip()]))
         self.merged_df['num_crew'] = self.merged_df['crew'].fillna('').apply(lambda x: len([c for c in x.split(',') if c.strip()]))
 
+<<<<<<< HEAD
     def add_text_length_features(self):
         self.merged_df['overview_length'] = self.merged_df['overview'].fillna('').apply(len)
         self.merged_df['title_length'] = self.merged_df['title'].fillna('').apply(len)
@@ -93,6 +97,8 @@ class FeatureEngineering:
                 lambda x: genre_ratings[genre] if genre in x else np.nan
             )
 
+=======
+>>>>>>> 848b2a5 (almost finilaize)
     def add_release_date_features(self):
         self.merged_df['release_date'] = pd.to_datetime(self.merged_df['release_date'], errors='coerce')
         self.merged_df['release_year'] = self.merged_df['release_date'].dt.year
@@ -138,6 +144,12 @@ class FeatureEngineering:
         country_dummies = pd.DataFrame(mlb_country.fit_transform(country_filtered), columns=[f'country_{c}' for c in mlb_country.classes_], index=self.merged_df.index)
         self.merged_df = pd.concat([self.merged_df, company_dummies, country_dummies], axis=1)
 
+<<<<<<< HEAD
+=======
+    def status_onehot(self):
+        self.merged_df = pd.get_dummies(self.merged_df, columns=['status'], drop_first=False)
+
+>>>>>>> 848b2a5 (almost finilaize)
     def add_target_encoding(self, col, target='vote_average', top_n=10):
         values = pd.Series([v for sublist in self.merged_df[col].fillna('').apply(lambda x: [i.strip() for i in x.split(',') if i.strip()]) for v in sublist])
         top_values = values.value_counts().head(top_n).index
@@ -149,9 +161,16 @@ class FeatureEngineering:
     def coding(self):
         self.add_target_encoding(col='genres')
         self.add_target_encoding(col='production_companies')
+<<<<<<< HEAD
     
     def Tfidf(self):
         tfidf_overview_vectorizer = TfidfVectorizer(max_features=2100, stop_words='english')
+=======
+        
+    
+    def Tfidf(self):
+        tfidf_overview_vectorizer = TfidfVectorizer(max_features=2600, stop_words='english')
+>>>>>>> 848b2a5 (almost finilaize)
         tfidf_overview_matrix = tfidf_overview_vectorizer.fit_transform(self.merged_df['overview'].fillna(''))
         self.tfidf_overview_df = pd.DataFrame(tfidf_overview_matrix.toarray(), columns=[f'overview_tfidf_{col}' for col in tfidf_overview_vectorizer.get_feature_names_out()], index=self.merged_df.index)
         
@@ -176,16 +195,29 @@ class FeatureEngineering:
         columns_for_svd_unique = unique_movies_df.select_dtypes(include=np.number).columns.tolist()
         columns_for_svd_unique = [col for col in columns_for_svd_unique if col not in ['rating', 'movieId', 'userId', 'timestamp', 'release_year', 'vote_average', 'vote_count']]
 
+<<<<<<< HEAD
+=======
+        # Fill NaNs with median for all SVD columns
+>>>>>>> 848b2a5 (almost finilaize)
         for col in columns_for_svd_unique:
             if unique_movies_df[col].isnull().any():
                 median_val = unique_movies_df[col].median()
                 unique_movies_df[col] = unique_movies_df[col].fillna(median_val)
+<<<<<<< HEAD
+=======
+        # Extra: fill any remaining NaNs with 0 (safety for SVD)
+        unique_movies_df[columns_for_svd_unique] = unique_movies_df[columns_for_svd_unique].fillna(0)
+>>>>>>> 848b2a5 (almost finilaize)
 
         if 'production_companies_Warner Bros._mean_vote_average' in unique_movies_df.columns:
             unique_movies_df['production_companies_Warner Bros._mean_vote_average'] = unique_movies_df['production_companies_Warner Bros._mean_vote_average'].fillna(0)
 
 
+<<<<<<< HEAD
         n_components = 150
+=======
+        n_components = 120
+>>>>>>> 848b2a5 (almost finilaize)
         svd = TruncatedSVD(n_components=n_components, random_state=42)
         svd_matrix_unique = svd.fit_transform(unique_movies_df[columns_for_svd_unique])
         svd_df_unique = pd.DataFrame(svd_matrix_unique, columns=[f'svd_{i+1}' for i in range(n_components)], index=unique_movies_df.index)
@@ -194,20 +226,30 @@ class FeatureEngineering:
         self.unique_movies_reduced = pd.concat([self.unique_movies_reduced, svd_df_unique], axis=1)
 
     def run_all(self):
+<<<<<<< HEAD
         self.ordering()
+=======
+>>>>>>> 848b2a5 (almost finilaize)
         self.outliers()
         self.add_budget_to_revenue_ratio()
         self.add_top_genre_onehot()
         self.add_log_features()
         self.add_interaction_features()
         self.add_count_features()
+<<<<<<< HEAD
         self.add_text_length_features()
         self.add_genre_mean_encoding()
+=======
+>>>>>>> 848b2a5 (almost finilaize)
         self.add_release_date_features()
         self.add_adult_flag()
         self.add_multi_hot_keywords()
         self.add_cast_crew_features()
         self.add_company_country_features()
+<<<<<<< HEAD
+=======
+        self.status_onehot()
+>>>>>>> 848b2a5 (almost finilaize)
         self.coding()
         self.Tfidf()
         self.merging_Tfidf()

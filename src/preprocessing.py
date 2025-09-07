@@ -32,6 +32,7 @@ class Preprocessing:
         fig = ax.get_figure()
         fig.savefig(self.img_path + "df_missing.png", dpi=300, bbox_inches='tight')
         plt.close(fig)
+<<<<<<< HEAD
         # Analyze missing value percentages from missing_df_info
         missing_df = self.df.isnull().sum().sort_values(ascending=False)
         missing_df_percent = (missing_df / len(self.df)) * 100
@@ -57,14 +58,22 @@ class Preprocessing:
 
 
         handling_strategy['adult'] = "Investigate and potentially remove incorrect entries (e.g., 'R')"
+=======
+>>>>>>> 848b2a5 (almost finilaize)
         
         # 1. Drop columns with high missing percentages
         cols_to_drop = ['belongs_to_collection', 'homepage', 'tagline']
         self.df = self.df.drop(columns=cols_to_drop)
+<<<<<<< HEAD
 
         # 2. Fill missing values in 'overview' with a placeholder
         self.df['overview'] = self.df['overview'].fillna('No overview available')
 
+=======
+        # 2. Fill missing values in 'overview' with a placeholder
+        self.df['overview'] = self.df['overview'].fillna('No overview available')
+        
+>>>>>>> 848b2a5 (almost finilaize)
         self.df['popularity'] = pd.to_numeric(self.df['popularity'], errors='coerce')
 
         numerical_cols_to_impute = ['runtime', 'vote_average', 'vote_count', 'revenue', 'popularity']
@@ -82,6 +91,7 @@ class Preprocessing:
         # Investigate and remove incorrect entries in 'adult' column
         self.df = self.df[self.df['adult'].isin(['True', 'False'])]
 
+<<<<<<< HEAD
     def extract_names_and_handle_empty(self, json_list_string):
             """Extracts names from a string representation of a list of dictionaries and handles empty lists as NaN."""
             if isinstance(json_list_string, str) and json_list_string.startswith('[') and json_list_string.endswith(']'):
@@ -115,12 +125,16 @@ class Preprocessing:
         # Drop null values in links_df
         self.links_df = self.links_df.dropna(subset=['tmdbId'])
         # Handling data types
+=======
+    def handle_df_and_link_df(self):
+>>>>>>> 848b2a5 (almost finilaize)
         self.df['id'] = pd.to_numeric(self.df['id'], errors='coerce')
         self.df.dropna(subset=['id'], inplace=True)
         self.df['id'] = self.df['id'].astype(int)
 
         self.links_df.dropna(subset=['tmdbId'], inplace=True)
         self.links_df['tmdbId'] = self.links_df['tmdbId'].astype(int)
+<<<<<<< HEAD
     
         copy_df = self.df.copy()
         # Columns identified as containing JSON format
@@ -151,11 +165,64 @@ class Preprocessing:
         self.keywords_df['keywords'] = self.keywords_df['keywords'].fillna('Unknown')
 
         # Remove duplicates from key columns
+=======
+
+    def extract_names_and_handle_empty(self, json_list_string):
+        """Extracts names from a string representation of a list of dictionaries and handles empty lists as NaN."""
+        if isinstance(json_list_string, str) and json_list_string.startswith('[') and json_list_string.endswith(']'):
+            try:
+                data_list = ast.literal_eval(json_list_string)
+                if isinstance(data_list, list):
+                    if not data_list:
+                        return np.nan
+                    names = [item.get('name', '') for item in data_list if isinstance(item, dict) and 'name' in item]
+                    return ', '.join(names)
+            except (ValueError, SyntaxError):
+                pass
+        return ''
+        
+
+    def extract_names_from_list(self, json_list_string, key='name'):
+        """Extracts values for a given key from a string representation of a list of dictionaries and handles empty lists as NaN."""
+        if isinstance(json_list_string, str) and json_list_string.startswith('[') and json_list_string.endswith(']'):
+            try:
+                data_list = ast.literal_eval(json_list_string)
+                if isinstance(data_list, list):
+                    if not data_list:  # Check if the list is empty
+                        return np.nan  # Replace empty list with NaN
+                    names = [item.get(key, '') for item in data_list if isinstance(item, dict) and key in item]
+                    return ', '.join(names)
+            except (ValueError, SyntaxError):
+                pass
+        return ''
+    
+    
+    def handel_jsons(self):
+        self.copy_df = self.df.copy()
+        json_columns = ['genres', 'production_companies', 'production_countries', 'spoken_languages']
+
+        for col in json_columns:
+            if col in self.copy_df.columns:
+                self.copy_df[col] = self.copy_df[col].apply(self.extract_names_and_handle_empty)
+                self.copy_df[col] = self.copy_df[col].fillna('Unknown')
+        self.df = self.copy_df.copy()
+        self.credits_df['cast'] = self.credits_df['cast'].apply(self.extract_names_from_list, key='name')
+        self.credits_df['crew'] = self.credits_df['crew'].apply(self.extract_names_from_list, key='name')
+
+        self.credits_df['cast'] = self.credits_df['cast'].fillna('Unknown')
+        self.credits_df['crew'] = self.credits_df['crew'].fillna('Unknown')
+
+        self.keywords_df['keywords'] = self.keywords_df['keywords'].apply(self.extract_names_from_list, key='name')
+        self.keywords_df['keywords'] = self.keywords_df['keywords'].fillna('Unknown')
+
+    def clean_data(self):
+>>>>>>> 848b2a5 (almost finilaize)
         self.df.drop_duplicates(subset=['id'], inplace=True)
         self.credits_df.drop_duplicates(subset=['id'], inplace=True)
         self.keywords_df.drop_duplicates(subset=['id'], inplace=True)
         self.links_df.drop_duplicates(subset=['tmdbId'], inplace=True)
         self.ratings_df.drop_duplicates(subset=['movieId', 'userId'], inplace=True)
+<<<<<<< HEAD
         
 
     def merge_data(self):
@@ -165,6 +232,47 @@ class Preprocessing:
         # Merge with links_df using tmdbId from links_df and id from self.merged_df
         self.merged_df = pd.merge(self.merged_df, self.links_df, left_on='id', right_on='tmdbId', how='inner')
         # Do NOT merge with ratings_df here! Only merge for modeling step.
+=======
+
+
+    def merge_data(self):
+        self.merged_df = pd.merge(self.df, self.credits_df, on='id', how='inner')
+        self.merged_df = pd.merge(self.merged_df, self.keywords_df, on='id', how='inner')
+        self.merged_df = pd.merge(self.merged_df, self.links_df, left_on='id', right_on='tmdbId', how='inner')
+        self.merged_df = pd.merge(self.merged_df, self.ratings_df, on='movieId', how='inner')
+
+    def remove_unwanted_columns(self):
+        # Drop redundant ID columns
+        self.merged_df = self.merged_df.drop(columns=['id', 'tmdbId', 'imdbId', 'imdb_id', 'original_title', 'video'])
+
+        # Define the desired column order
+        desired_column_order = [
+            'movieId',
+            'title',
+            'release_date',
+            'runtime',
+            'status',
+            'adult',
+            'budget',
+            'revenue',
+            'popularity',
+            'vote_average',
+            'vote_count',
+            'overview',
+            'genres',
+            'keywords',
+            'cast',
+            'crew',
+            'production_companies',
+            'production_countries',
+            'original_language',
+            'userId',
+            'rating',
+        ]
+
+        self.merged_df = self.merged_df.reindex(columns=desired_column_order)
+
+>>>>>>> 848b2a5 (almost finilaize)
 
     def generate_interim_va_proceed_csv(self):
         # Save cleaned DataFrames to interim CSV files
@@ -178,6 +286,11 @@ class Preprocessing:
     def run_all(self):
         self.load_data()
         self.df_missing_value()
+<<<<<<< HEAD
+=======
+        self.handle_df_and_link_df()
+        self.handel_jsons()
+>>>>>>> 848b2a5 (almost finilaize)
         self.clean_data()
         self.merge_data()
         self.generate_interim_va_proceed_csv()

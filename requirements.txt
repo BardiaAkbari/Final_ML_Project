@@ -8,4 +8,9 @@ plotly
 pycountry
 kaleido
 scikit-learn
+<<<<<<< HEAD
 scikit-surprise
+=======
+scikit-surprise
+gradio
+>>>>>>> 848b2a5 (almost finilaize)

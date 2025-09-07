@@ -4,6 +4,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics import mean_squared_error
 from surprise import Dataset, Reader, KNNBasic, SVD, accuracy
 from surprise.model_selection import train_test_split, GridSearchCV
+<<<<<<< HEAD
+=======
+import joblib
+>>>>>>> 848b2a5 (almost finilaize)
 
 class RecommenderModels:
     def __init__(self, merged_df_with_tfidf, unique_movies_reduced, ratings_df):
@@ -16,6 +20,12 @@ class RecommenderModels:
         self.svd_mf = None
         self.svd_mf_tuned = None
         self.best_alpha = None
+<<<<<<< HEAD
+=======
+        self.model_dir = "models"
+        import os
+        os.makedirs(self.model_dir, exist_ok=True)
+>>>>>>> 848b2a5 (almost finilaize)
 
     # ---------- Popularity Baseline ----------
     def fit_popularity(self):
@@ -152,6 +162,36 @@ class RecommenderModels:
         rmse = np.sqrt(mean_squared_error(actuals, preds))
         return rmse
 
+<<<<<<< HEAD
+=======
+    def save_models(self, prefix="recommender"):
+        # Save collaborative models
+        joblib.dump(self.knn_user_based, f"{self.model_dir}/{prefix}_knn_user_based.pkl")
+        joblib.dump(self.svd_mf, f"{self.model_dir}/{prefix}_svd_mf.pkl")
+        if self.svd_mf_tuned is not None:
+            joblib.dump(self.svd_mf_tuned, f"{self.model_dir}/{prefix}_svd_mf_tuned.pkl")
+        # Save user profiles and other numpy/pandas objects
+        joblib.dump(self.user_profiles, f"{self.model_dir}/{prefix}_user_profiles.pkl")
+        joblib.dump(self.popular_movies_unique, f"{self.model_dir}/{prefix}_popular_movies_unique.pkl")
+        joblib.dump(self.unique_movies_reduced, f"{self.model_dir}/{prefix}_unique_movies_reduced.pkl")
+        joblib.dump(self.merged_df_with_tfidf, f"{self.model_dir}/{prefix}_merged_df_with_tfidf.pkl")
+        print(f"Models and data saved to {self.model_dir}/")
+
+    def load_models(self, prefix="recommender"):
+        # Load collaborative models
+        self.knn_user_based = joblib.load(f"{self.model_dir}/{prefix}_knn_user_based.pkl")
+        self.svd_mf = joblib.load(f"{self.model_dir}/{prefix}_svd_mf.pkl")
+        try:
+            self.svd_mf_tuned = joblib.load(f"{self.model_dir}/{prefix}_svd_mf_tuned.pkl")
+        except Exception:
+            self.svd_mf_tuned = None
+        self.user_profiles = joblib.load(f"{self.model_dir}/{prefix}_user_profiles.pkl")
+        self.popular_movies_unique = joblib.load(f"{self.model_dir}/{prefix}_popular_movies_unique.pkl")
+        self.unique_movies_reduced = joblib.load(f"{self.model_dir}/{prefix}_unique_movies_reduced.pkl")
+        self.merged_df_with_tfidf = joblib.load(f"{self.model_dir}/{prefix}_merged_df_with_tfidf.pkl")
+        print(f"Models and data loaded from {self.model_dir}/")
+
+>>>>>>> 848b2a5 (almost finilaize)
 # Example usage:
 # models = RecommenderModels(merged_df_with_tfidf, unique_movies_reduced, ratings_df)
 # models.fit_popularity()
